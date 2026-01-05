@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 
-const inter = Inter({ subsets: ["latin"] });
+const quicksand = Quicksand({ subsets: ["latin"], display: 'swap' });
 
 export const metadata: Metadata = {
-  title: "Budget Planner",
+  title: "Murni Snack Budget Planner",
   description: "Kelola keuangan toko Anda dengan mudah",
 };
 
@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
-      <body className={`${inter.className} min-h-screen bg-neutral-950 text-neutral-100 antialiased`}>
+      <body className={`${quicksand.className} min-h-screen bg-neutral-950 text-neutral-100 antialiased`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

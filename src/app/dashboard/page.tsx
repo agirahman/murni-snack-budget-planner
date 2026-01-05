@@ -4,12 +4,11 @@ import { useEffect, useState, useMemo } from "react";
 import api from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { ChartArea } from "@/components/ui/ChartArea";
-import { Modal } from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/Skeleton";
+import dynamic from "next/dynamic";
 
 interface Transaction {
     _id: string;
@@ -20,11 +19,14 @@ interface Transaction {
     date: string;
 }
 
-interface DashboardSummary {
-    income: number;
-    expense: number;
-    total: number;
-}
+const ChartArea = dynamic(() => import("@/components/ui/ChartArea").then((mod) => mod.ChartArea), {
+    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
+    ssr: false,
+});
+
+const Modal = dynamic(() => import("@/components/ui/Modal").then((mod) => mod.Modal), {
+    ssr: false,
+});
 
 export default function DashboardPage() {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -165,8 +167,6 @@ export default function DashboardPage() {
             maximumFractionDigits: 0
         }).format(num);
     };
-
-    // Remove this chunk because I am deleting the previous Filter Code block which is outdated
 
     // Loading State
     if (isLoading) {
@@ -325,7 +325,6 @@ export default function DashboardPage() {
             <Card className="p-6">
                 <h3 className="text-lg font-semibold text-white mb-6">Grafik Arus Kas (Net)</h3>
                 <div className="h-[300px] w-full">
-                    {/* Trik: Gunakan dataKeyY='amount' yang isinya positif/negatif */}
                     <ChartArea
                         data={chartData}
                         dataKeyX="date"
@@ -364,12 +363,9 @@ export default function DashboardPage() {
 
                 <div className="grid gap-4">
                     {filteredTransactions.map((t, i) => (
-                        <motion.div
+                        <div
                             key={t._id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: i * 0.05 }}
-                            className="p-4 rounded-2xl bg-neutral-900/50 border border-neutral-800 flex items-center justify-between hover:border-neutral-700 transition-colors"
+                            className="p-4 rounded-2xl bg-neutral-900/50 border border-neutral-800 flex items-center justify-between hover:border-neutral-700 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
                         >
                             <div className="flex items-center gap-4">
                                 <div className={`p-2 rounded-full ${t.type === 'pemasukan' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
@@ -383,7 +379,7 @@ export default function DashboardPage() {
                             <span className={`font-bold ${t.type === 'pemasukan' ? 'text-emerald-400' : 'text-red-400'}`}>
                                 {t.type === 'pemasukan' ? '+' : '-'}{formatRupiah(t.amount)}
                             </span>
-                        </motion.div>
+                        </div>
                     ))}
                     {filteredTransactions.length === 0 && !isLoading && (
                         <p className="text-center text-neutral-500 py-8">Belum ada transaksi</p>

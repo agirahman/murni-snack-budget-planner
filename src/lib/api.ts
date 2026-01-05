@@ -10,7 +10,6 @@ const api = axios.create({
 // Interceptor untuk menyisipkan token ke setiap request
 api.interceptors.request.use(
     (config) => {
-        // Pastikan kode ini hanya jalan di client-side (browser)
         if (typeof window !== 'undefined') {
             const token = localStorage.getItem('token');
             if (token) {
@@ -29,10 +28,8 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response && error.response.status === 401) {
-            // Token tidak valid atau kadaluarsa
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('token');
-                // Redirect ke login tanpa refresh halaman (opsional, tapi window.location lebih aman untuk reset state)
                 window.location.href = '/login';
             }
         }
