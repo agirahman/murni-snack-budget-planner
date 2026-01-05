@@ -5,7 +5,7 @@ import api from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet } from "lucide-react";
+import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/Skeleton";
 import dynamic from "next/dynamic";
@@ -33,6 +33,7 @@ export default function DashboardPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [filterType, setFilterType] = useState<"all" | "pemasukan" | "pengeluaran">("all");
+    const [showBalance, setShowBalance] = useState(true);
 
     // Date Filter State
     const [dateFilter, setDateFilter] = useState<"all" | "today" | "week" | "month" | "year" | "custom">("month"); // Default This Month
@@ -186,7 +187,7 @@ export default function DashboardPage() {
                 {/* Summary Cards Skeleton */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[1, 2, 3].map((i) => (
-                        <Card key={i} className="border-neutral-800">
+                        <Card key={i} className="border-neutral-200 dark:border-neutral-800">
                             <div className="flex items-center gap-4">
                                 <Skeleton className="h-12 w-12 rounded-xl" />
                                 <div className="space-y-2">
@@ -199,7 +200,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Chart Skeleton */}
-                <Card className="p-6 border-neutral-800">
+                <Card className="p-6 border-neutral-200 dark:border-neutral-800">
                     <Skeleton className="h-6 w-48 mb-6" />
                     <Skeleton className="h-[300px] w-full rounded-xl" />
                 </Card>
@@ -209,7 +210,7 @@ export default function DashboardPage() {
                     <Skeleton className="h-6 w-32" />
                     <div className="grid gap-4">
                         {[1, 2, 3, 4].map((i) => (
-                            <div key={i} className="p-4 rounded-2xl bg-neutral-900/50 border border-neutral-800 flex items-center justify-between">
+                            <div key={i} className="p-4 rounded-2xl bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
                                     <Skeleton className="h-10 w-10 rounded-full" />
                                     <div className="space-y-2">
@@ -232,24 +233,24 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-4">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-white">Dashboard Keuangan</h1>
-                        <p className="text-neutral-400">Ringkasan performa toko Anda</p>
+                        <h1 className="text-3xl font-bold text-neutral-900 dark:text-white">Dashboard Keuangan</h1>
+                        <p className="text-neutral-500 dark:text-neutral-400">Ringkasan performa toko Anda</p>
                     </div>
-                    <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-500">
+                    <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-600/20">
                         <Plus className="mr-2 h-4 w-4" />
                         Transaksi Baru
                     </Button>
                 </div>
 
                 {/* Date Filters */}
-                <div className="flex flex-wrap items-center gap-2 bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-800 w-fit">
+                <div className="flex flex-wrap items-center gap-2 bg-white dark:bg-neutral-900 p-1.5 rounded-xl border border-neutral-200 dark:border-neutral-800 w-fit shadow-sm">
                     {(['today', 'week', 'month', 'year', 'all', 'custom'] as const).map((filter) => (
                         <button
                             key={filter}
                             onClick={() => setDateFilter(filter)}
                             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${dateFilter === filter
-                                ? 'bg-neutral-800 text-white shadow-sm'
-                                : 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/50'
+                                ? 'bg-neutral-900 dark:bg-neutral-800 text-white shadow-sm'
+                                : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800'
                                 }`}
                         >
                             {filter === 'today' && 'Hari Ini'}
@@ -264,14 +265,13 @@ export default function DashboardPage() {
 
                 {/* Custom Range Inputs */}
                 {dateFilter === 'custom' && (
-                    <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+                    <div className="flex items-center animate-in fade-in slide-in-from-top-2">
                         <Input
                             type="date"
-                            className="w-auto h-9"
+                            className="w-auto h-9 "
                             value={customRange.start}
                             onChange={(e) => setCustomRange(prev => ({ ...prev, start: e.target.value }))}
                         />
-                        <span className="text-neutral-500">-</span>
                         <Input
                             type="date"
                             className="w-auto h-9"
@@ -284,52 +284,64 @@ export default function DashboardPage() {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-gradient-to-br from-blue-900/20 to-blue-900/5 border-blue-500/20">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/5 border-blue-200 dark:border-blue-500/20 relative">
+                    <button
+                        onClick={() => setShowBalance(!showBalance)}
+                        className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-blue-600 dark:text-blue-400 transition-colors"
+                    >
+                        {showBalance ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </button>
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-blue-500/20 rounded-xl text-blue-400">
+                        <div className="p-3 bg-blue-100 dark:bg-blue-500/20 rounded-xl text-blue-600 dark:text-blue-400">
                             <Wallet size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-neutral-400">Total Saldo</p>
-                            <h3 className="text-2xl font-bold text-white">{formatRupiah(summary.total)}</h3>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">Total Saldo</p>
+                            <h3 className="text-2xl font-bold text-neutral-900 dark:text-white">
+                                {showBalance ? formatRupiah(summary.total) : "Rp •••••••"}
+                            </h3>
                         </div>
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-emerald-900/20 to-emerald-900/5 border-emerald-500/20">
+                <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-900/5 border-emerald-200 dark:border-emerald-500/20">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-emerald-500/20 rounded-xl text-emerald-400">
+                        <div className="p-3 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400">
                             <ArrowUpCircle size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-neutral-400">Pemasukan</p>
-                            <h3 className="text-2xl font-bold text-emerald-400">{formatRupiah(summary.income)}</h3>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">Pemasukan</p>
+                            <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                                {showBalance ? formatRupiah(summary.income) : "Rp •••••••"}
+                            </h3>
                         </div>
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-red-900/20 to-red-900/5 border-red-500/20">
+                <Card className="bg-gradient-to-br from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-900/5 border-red-200 dark:border-red-500/20">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-red-500/20 rounded-xl text-red-400">
+                        <div className="p-3 bg-red-100 dark:bg-red-500/20 rounded-xl text-red-600 dark:text-red-400">
                             <ArrowDownCircle size={24} />
                         </div>
                         <div>
-                            <p className="text-sm text-neutral-400">Pengeluaran</p>
-                            <h3 className="text-2xl font-bold text-red-400">{formatRupiah(summary.expense)}</h3>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400">Pengeluaran</p>
+                            <h3 className="text-2xl font-bold text-red-600 dark:text-red-400">
+                                {showBalance ? formatRupiah(summary.expense) : "Rp •••••••"}
+                            </h3>
                         </div>
                     </div>
                 </Card>
             </div>
 
             {/* Chart Section */}
-            <Card className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-6">Grafik Arus Kas (Net)</h3>
+            <Card className="p-6 border-neutral-200 dark:border-neutral-800">
+                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-6">Grafik Arus Kas (Net)</h3>
                 <div className="h-[300px] w-full">
                     <ChartArea
                         data={chartData}
                         dataKeyX="date"
                         dataKeyY="amount"
-                        color="#3b82f6"
+                        color="#2563eb"
                         height={300}
                     />
                 </div>
@@ -338,23 +350,23 @@ export default function DashboardPage() {
             {/* Transactions List */}
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-semibold text-white">Riwayat Transaksi</h3>
+                    <h3 className="text-xl font-semibold text-neutral-900 dark:text-white">Riwayat Transaksi</h3>
                     <div className="flex gap-2">
                         <button
                             onClick={() => setFilterType("all")}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${filterType === 'all' ? 'bg-white text-black border-white' : 'bg-transparent text-neutral-400 border-neutral-800 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${filterType === 'all' ? 'bg-neutral-900 dark:bg-white text-white dark:text-black border-neutral-900 dark:border-white' : 'bg-transparent text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
                         >
                             Semua
                         </button>
                         <button
                             onClick={() => setFilterType("pemasukan")}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${filterType === 'pemasukan' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50' : 'bg-transparent text-neutral-400 border-neutral-800 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${filterType === 'pemasukan' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/50' : 'bg-transparent text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
                         >
                             Masuk
                         </button>
                         <button
                             onClick={() => setFilterType("pengeluaran")}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${filterType === 'pengeluaran' ? 'bg-red-500/20 text-red-400 border-red-500/50' : 'bg-transparent text-neutral-400 border-neutral-800 hover:text-white'}`}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border ${filterType === 'pengeluaran' ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-500/50' : 'bg-transparent text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-neutral-800 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
                         >
                             Keluar
                         </button>
@@ -365,18 +377,18 @@ export default function DashboardPage() {
                     {filteredTransactions.map((t, i) => (
                         <div
                             key={t._id}
-                            className="p-4 rounded-2xl bg-neutral-900/50 border border-neutral-800 flex items-center justify-between hover:border-neutral-700 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
+                            className="p-4 rounded-2xl bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
                         >
                             <div className="flex items-center gap-4">
-                                <div className={`p-2 rounded-full ${t.type === 'pemasukan' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500'}`}>
+                                <div className={`p-2 rounded-full ${t.type === 'pemasukan' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-500' : 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-500'}`}>
                                     {t.type === 'pemasukan' ? <ArrowUpCircle size={20} /> : <ArrowDownCircle size={20} />}
                                 </div>
                                 <div>
-                                    <h4 className="font-medium text-white">{t.description}</h4>
-                                    <p className="text-xs text-neutral-500">{t.category} • {new Date(t.date).toLocaleDateString("id-ID")}</p>
+                                    <h4 className="font-medium text-neutral-900 dark:text-white">{t.description}</h4>
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">{t.category} • {new Date(t.date).toLocaleDateString("id-ID")}</p>
                                 </div>
                             </div>
-                            <span className={`font-bold ${t.type === 'pemasukan' ? 'text-emerald-400' : 'text-red-400'}`}>
+                            <span className={`font-bold ${t.type === 'pemasukan' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
                                 {t.type === 'pemasukan' ? '+' : '-'}{formatRupiah(t.amount)}
                             </span>
                         </div>
@@ -395,19 +407,19 @@ export default function DashboardPage() {
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-neutral-400 mb-1">Jenis Transaksi</label>
+                        <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Jenis Transaksi</label>
                         <div className="grid grid-cols-2 gap-2">
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: "pemasukan" })}
-                                className={`p-2 rounded-lg text-sm transition-colors ${formData.type === "pemasukan" ? "bg-emerald-600 text-white" : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"}`}
+                                className={`p-2 rounded-lg text-sm transition-colors ${formData.type === "pemasukan" ? "bg-emerald-600 text-white shadow-sm" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700"}`}
                             >
                                 Pemasukan
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, type: "pengeluaran" })}
-                                className={`p-2 rounded-lg text-sm transition-colors ${formData.type === "pengeluaran" ? "bg-red-600 text-white" : "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"}`}
+                                className={`p-2 rounded-lg text-sm transition-colors ${formData.type === "pengeluaran" ? "bg-red-600 text-white shadow-sm" : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:bg-neutral-200 dark:hover:bg-neutral-700"}`}
                             >
                                 Pengeluaran
                             </button>

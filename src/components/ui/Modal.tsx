@@ -40,14 +40,14 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="bg-neutral-900 border border-neutral-800 w-full max-w-lg rounded-2xl shadow-2xl pointer-events-auto overflow-hidden"
+                            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 w-full max-w-lg rounded-2xl shadow-xl pointer-events-auto overflow-hidden"
                         >
                             {/* Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-neutral-800">
-                                <h3 className="text-xl font-semibold text-white">{title}</h3>
+                            <div className="flex items-center justify-between p-6 border-b border-neutral-100 dark:border-neutral-800">
+                                <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100">{title}</h3>
                                 <button
                                     onClick={onClose}
-                                    className="p-2 hover:bg-neutral-800 rounded-full transition-colors text-neutral-400 hover:text-white"
+                                    className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-colors text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100"
                                 >
                                     <X size={20} />
                                 </button>

@@ -10,15 +10,25 @@ export const metadata: Metadata = {
   description: "Kelola keuangan toko Anda dengan mudah",
 };
 
+import { ThemeProvider } from "@/providers/theme-provider";
+// import { ModeToggle } from "@/components/ui/ModeToggle";
+
+// ... (imports)
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id">
-      <body className={`${quicksand.className} min-h-screen bg-neutral-950 text-neutral-100 antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+    <html lang="id" suppressHydrationWarning>
+      <body className={`${quicksand.className} min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* <div className="fixed top-4 right-4 z-50">
+            <ModeToggle />
+          </div> */}
+          <AuthProvider>{children}</AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

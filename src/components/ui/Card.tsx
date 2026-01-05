@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, HTMLMotionProps } from "framer-motion";
+import { HTMLAttributes } from "react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -8,23 +8,16 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-interface CardProps extends HTMLMotionProps<"div"> {
-    children: React.ReactNode;
-}
+interface CardProps extends HTMLAttributes<HTMLDivElement> { }
 
-export const Card = ({ className, children, ...props }: CardProps) => {
+export const Card = ({ className, ...props }: CardProps) => {
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: "easeOut" }}
+        <div
             className={cn(
-                "rounded-2xl border border-white/5 bg-white/5 backdrop-blur-xl p-6 shadow-xl",
+                "rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 dark:backdrop-blur-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500",
                 className
             )}
             {...props}
-        >
-            {children}
-        </motion.div>
+        />
     );
 };

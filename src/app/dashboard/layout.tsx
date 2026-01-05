@@ -5,6 +5,7 @@ import { LogOut, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { ModeToggle } from "@/components/ui/ModeToggle";
 
 export default function DashboardLayout({
     children,
@@ -49,9 +50,9 @@ export default function DashboardLayout({
     }
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col">
+        <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-100 flex flex-col">
             {/* Navbar */}
-            <header className="fixed top-0 left-0 right-0 z-30 h-16 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-md">
+            <header className="fixed top-0 left-0 right-0 z-30 h-16 border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md">
                 <div className="container mx-auto px-4 h-full flex items-center justify-between">
                     <Link href="/dashboard" className="flex items-center gap-2 text-blue-500 font-bold text-xl">
                         <LayoutDashboard />
@@ -60,8 +61,8 @@ export default function DashboardLayout({
 
                     <div className="flex items-center gap-4">
                         <div className="hidden md:block text-sm text-right">
-                            <p className="text-white font-medium">{user?.name}</p>
-                            <p className="text-neutral-500 text-xs">{user?.email} ({user?.role})</p>
+                            <p className="dark:text-white text-neutral-900 font-medium">{user?.name}</p>
+                            <p className="dark:text-neutral-400 text-neutral-500 text-xs">{user?.email} ({user?.role})</p>
                         </div>
                         <Button
                             variant="ghost"
@@ -71,6 +72,7 @@ export default function DashboardLayout({
                             <LogOut size={18} className="mr-2" />
                             Keluar
                         </Button>
+                        <ModeToggle />
                     </div>
                 </div>
             </header>
