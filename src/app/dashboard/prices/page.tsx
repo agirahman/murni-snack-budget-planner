@@ -10,7 +10,8 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { PriceTrendChart } from "@/components/ui/PriceTrendChart";
-import { Plus, TrendingUp, TrendingDown, Minus, Calendar, BarChart3, Info } from "lucide-react";
+import { Combobox } from "@/components/ui/Combobox";
+import { Plus, TrendingUp, TrendingDown, Minus, Calendar, BarChart3, Info, Search } from "lucide-react";
 
 interface Product {
     _id: string;
@@ -208,25 +209,18 @@ export default function PricesPage() {
                     <div className="max-w-4xl mx-auto">
                         <div className="flex flex-col sm:flex-row gap-3 items-end">
                             <div className="flex-1 w-full">
-                                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5 flex items-center gap-1.5">
-                                    <Info size={14} className="text-blue-500" />
-                                    Filter Produk
-                                </label>
-                                <select
+                                <Combobox
+                                    label="Filter Produk"
+                                    placeholder="Cari & Pilih Produk..."
+                                    searchPlaceholder="Ketik nama produk..."
+                                    options={products.map(p => ({
+                                        id: p._id,
+                                        label: p.nama_produk,
+                                        metadata: `${prices.filter(pr => pr.product_id._id === p._id).length} data`
+                                    }))}
                                     value={selectedProductId}
-                                    onChange={(e) => setSelectedProductId(e.target.value)}
-                                    className="w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm px-3 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer hover:border-neutral-300 dark:hover:border-neutral-700"
-                                >
-                                    <option value="">Semua Produk ({prices.length} data)</option>
-                                    {products.map((product) => {
-                                        const count = prices.filter(p => p.product_id._id === product._id).length;
-                                        return (
-                                            <option key={product._id} value={product._id}>
-                                                {product.nama_produk} ({count} data)
-                                            </option>
-                                        );
-                                    })}
-                                </select>
+                                    onChange={(val) => setSelectedProductId(val)}
+                                />
                             </div>
                             {selectedProductId && (
                                 <button
@@ -299,24 +293,17 @@ export default function PricesPage() {
                 >
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Product Select */}
-                        <div>
-                            <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-                                Pilih Produk
-                            </label>
-                            <select
-                                value={formData.product_id}
-                                onChange={(e) => handleProductChange(e.target.value)}
-                                className="w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 px-3 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                                required
-                            >
-                                <option value="">-- Pilih Produk --</option>
-                                {products.map((product) => (
-                                    <option key={product._id} value={product._id}>
-                                        {product.nama_produk} ({product.satuan_default.toUpperCase()})
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        <Combobox
+                            label="Pilih Produk"
+                            placeholder="Cari & Pilih Produk..."
+                            options={products.map(p => ({
+                                id: p._id,
+                                label: p.nama_produk,
+                                metadata: p.satuan_default.toUpperCase()
+                            }))}
+                            value={formData.product_id}
+                            onChange={(val) => handleProductChange(val)}
+                        />
 
                         {/* Price Input */}
                         <Input
