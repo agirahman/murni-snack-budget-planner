@@ -5,8 +5,7 @@ import api from "@/lib/api";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Eye, EyeOff } from "lucide-react";
-import { motion } from "framer-motion";
+import { Plus, ArrowUpCircle, ArrowDownCircle, Wallet, Eye, EyeOff, ShoppingBag, Users, Settings, TrendingUp, Utensils, MoreHorizontal, PieChart } from "lucide-react";
 import { Skeleton } from "@/components/ui/Skeleton";
 import dynamic from "next/dynamic";
 
@@ -20,7 +19,7 @@ interface Transaction {
 }
 
 const ChartArea = dynamic(() => import("@/components/ui/ChartArea").then((mod) => mod.ChartArea), {
-    loading: () => <Skeleton className="h-[300px] w-full rounded-xl" />,
+    loading: () => <Skeleton className="h-75 w-full rounded-xl" />,
     ssr: false,
 });
 
@@ -160,6 +159,36 @@ export default function DashboardPage() {
         return data;
     }, [filteredByDate, filterType]);
 
+    // 5. Category Icon & Color mapping
+    const categoryConfig: Record<string, { icon: any, color: string, bg: string }> = {
+        "Stok": { icon: ShoppingBag, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-500/10" },
+        "Gaji": { icon: Users, color: "text-purple-600 dark:text-purple-400", bg: "bg-purple-100 dark:bg-purple-500/10" },
+        "Operasional": { icon: Settings, color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-100 dark:bg-amber-500/10" },
+        "Penjualan": { icon: TrendingUp, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-100 dark:bg-emerald-500/10" },
+        "Makan": { icon: Utensils, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-100 dark:bg-orange-500/10" },
+        "default": { icon: MoreHorizontal, color: "text-neutral-600 dark:text-neutral-400", bg: "bg-neutral-100 dark:bg-neutral-800" }
+    };
+
+    const getCategoryStyles = (category: string) => {
+        const key = Object.keys(categoryConfig).find(k => category.toLowerCase().includes(k.toLowerCase())) || "default";
+        return categoryConfig[key];
+    };
+
+    // 6. Calculate Top Categories
+    const topCategories = useMemo(() => {
+        const catMap: Record<string, number> = {};
+        filteredByDate.forEach(t => {
+            if (t.type === 'pengeluaran') {
+                catMap[t.category] = (catMap[t.category] || 0) + t.amount;
+            }
+        });
+
+        return Object.entries(catMap)
+            .map(([name, amount]) => ({ name, amount }))
+            .sort((a, b) => b.amount - a.amount)
+            .slice(0, 4);
+    }, [filteredByDate]);
+
     // Format Currency
     const formatRupiah = (num: number) => {
         return new Intl.NumberFormat("id-ID", {
@@ -202,7 +231,7 @@ export default function DashboardPage() {
                 {/* Chart Skeleton */}
                 <Card className="p-6 border-neutral-200 dark:border-neutral-800">
                     <Skeleton className="h-6 w-48 mb-6" />
-                    <Skeleton className="h-[300px] w-full rounded-xl" />
+                    <Skeleton className="h-75 w-full rounded-xl" />
                 </Card>
 
                 {/* List Skeleton */}
@@ -284,7 +313,7 @@ export default function DashboardPage() {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/5 border-blue-200 dark:border-blue-500/20 relative">
+                <Card className="bg-linear-to-br from-blue-50 to-blue-100/50 dark:from-blue-900/20 dark:to-blue-900/5 border-blue-200 dark:border-blue-500/20 relative">
                     <button
                         onClick={() => setShowBalance(!showBalance)}
                         className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-blue-600 dark:text-blue-400 transition-colors"
@@ -304,7 +333,7 @@ export default function DashboardPage() {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-900/5 border-emerald-200 dark:border-emerald-500/20">
+                <Card className="bg-linear-to-br from-emerald-50 to-emerald-100/50 dark:from-emerald-900/20 dark:to-emerald-900/5 border-emerald-200 dark:border-emerald-500/20">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-emerald-100 dark:bg-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-400">
                             <ArrowUpCircle size={24} />
@@ -318,7 +347,7 @@ export default function DashboardPage() {
                     </div>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-900/5 border-red-200 dark:border-red-500/20">
+                <Card className="bg-linear-to-br from-red-50 to-red-100/50 dark:from-red-900/20 dark:to-red-900/5 border-red-200 dark:border-red-500/20">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-red-100 dark:bg-red-500/20 rounded-xl text-red-600 dark:text-red-400">
                             <ArrowDownCircle size={24} />
@@ -333,19 +362,72 @@ export default function DashboardPage() {
                 </Card>
             </div>
 
-            {/* Chart Section */}
-            <Card className="p-6 border-neutral-200 dark:border-neutral-800">
-                <h3 className="text-lg font-semibold text-neutral-900 dark:text-white mb-6">Grafik Arus Kas (Net)</h3>
-                <div className="h-[300px] w-full">
-                    <ChartArea
-                        data={chartData}
-                        dataKeyX="date"
-                        dataKeyY="amount"
-                        color="#2563eb"
-                        height={300}
-                    />
-                </div>
-            </Card>
+            {/* Dashboard Insights & Chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Chart Section */}
+                <Card className="lg:col-span-2 p-6 border-neutral-200 dark:border-neutral-800 shadow-sm overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">Arus Kas (Net)</h3>
+                        <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+                            <TrendingUp size={18} className="text-blue-600 dark:text-blue-400" />
+                        </div>
+                    </div>
+                    <div className="h-75 w-full">
+                        <ChartArea
+                            data={chartData}
+                            dataKeyX="date"
+                            dataKeyY="amount"
+                            color="#3b82f6"
+                            height={300}
+                        />
+                    </div>
+                </Card>
+
+                {/* Top Categories Section */}
+                <Card className="p-6 border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">Top Pengeluaran</h3>
+                        <div className="p-2 bg-purple-50 dark:bg-purple-500/10 rounded-lg">
+                            <PieChart size={18} className="text-purple-600 dark:text-purple-400" />
+                        </div>
+                    </div>
+                    <div className="space-y-5">
+                        {topCategories.length > 0 ? topCategories.map((cat, i) => {
+                            const styles = getCategoryStyles(cat.name);
+                            const Icon = styles.icon;
+                            // Approximate percentage for progress bar (relative to total expense)
+                            const percentage = (cat.amount / summary.expense) * 100;
+
+                            return (
+                                <div key={cat.name} className="space-y-2">
+                                    <div className="flex items-center justify-between group">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2 rounded-lg transition-colors ${styles.bg}`}>
+                                                <Icon size={16} className={styles.color} />
+                                            </div>
+                                            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">{cat.name}</span>
+                                        </div>
+                                        <span className="text-sm font-bold text-neutral-900 dark:text-white">{formatRupiah(cat.amount)}</span>
+                                    </div>
+                                    <div className="h-1.5 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full opacity-80 rounded-full transition-all duration-1000 ${styles.color.replace('text-', 'bg-')}`}
+                                            style={{ width: `${percentage}%` }}
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        }) : (
+                            <div className="h-full flex flex-col items-center justify-center py-8 text-neutral-400">
+                                <PieChart size={32} className="mb-2 opacity-20" />
+                                <p className="text-xs">Belum ada data pengeluaran</p>
+                            </div>
+                        )}
+                    </div>
+                </Card>
+            </div>
 
             {/* Transactions List */}
             <div className="space-y-4">
@@ -374,14 +456,18 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="grid gap-4">
-                    {filteredTransactions.map((t, i) => (
+                    {filteredTransactions.map((t) => (
                         <div
                             key={t._id}
                             className="p-4 rounded-2xl bg-white dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 flex items-center justify-between hover:border-neutral-300 dark:hover:border-neutral-700 transition-colors animate-in fade-in slide-in-from-bottom-2 duration-300"
                         >
                             <div className="flex items-center gap-4">
-                                <div className={`p-2 rounded-full ${t.type === 'pemasukan' ? 'bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-500' : 'bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-500'}`}>
-                                    {t.type === 'pemasukan' ? <ArrowUpCircle size={20} /> : <ArrowDownCircle size={20} />}
+                                <div className={`p-2.5 rounded-2xl transition-all duration-300 ${getCategoryStyles(t.category).bg}`}>
+                                    {(() => {
+                                        const styles = getCategoryStyles(t.category);
+                                        const Icon = styles.icon;
+                                        return <Icon size={20} className={styles.color} />;
+                                    })()}
                                 </div>
                                 <div>
                                     <h4 className="font-medium text-neutral-900 dark:text-white">{t.description}</h4>

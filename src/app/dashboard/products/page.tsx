@@ -32,6 +32,7 @@ export default function ProductsPage() {
         satuan_default: "kg" as "kg" | "dus"
     });
     const [searchTerm, setSearchTerm] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -59,6 +60,9 @@ export default function ProductsPage() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
         try {
             if (editingProduct) {
                 await api.put(`/products/${editingProduct._id}`, formData);
@@ -74,6 +78,8 @@ export default function ProductsPage() {
         } catch (error) {
             console.error("Error saving product:", error);
             showToast("Gagal menyimpan produk", "error");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -132,15 +138,23 @@ export default function ProductsPage() {
                     </Button>
                 </div>
 
-                {/* Search */}
-                <Input
-                    placeholder="Cari produk..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
+                {/* Sticky Search Container */}
+                <div className="sticky top-16 z-20 -mx-4 px-4 py-4 bg-neutral-50/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-transparent transition-all duration-200">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="relative group/search">
+                            <Input
+                                placeholder="Cari produk berdasarkan nama..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="pl-4 h-12 rounded-2xl bg-white dark:bg-neutral-900 shadow-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
 
                 {/* Products List */}
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden border-neutral-200 dark:border-neutral-800 shadow-sm relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
                     {loading ? (
                         <div className="p-8 text-center text-neutral-500">Memuat data...</div>
                     ) : filteredProducts.length === 0 ? (
@@ -223,7 +237,11 @@ export default function ProductsPage() {
                             </div>
                         </div>
 
-                        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white">
+                        <Button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white mt-2"
+                            isLoading={isSubmitting}
+                        >
                             {editingProduct ? "Simpan Perubahan" : "Tambah Produk"}
                         </Button>
                     </form>

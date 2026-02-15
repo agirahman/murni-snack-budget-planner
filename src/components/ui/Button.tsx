@@ -23,10 +23,10 @@ export const Button = ({
     ...props
 }: ButtonProps) => {
     const variants = {
-        primary: "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20",
-        secondary: "bg-neutral-800 hover:bg-neutral-700 text-neutral-100 border border-neutral-700",
-        danger: "bg-red-600 hover:bg-red-500 text-white shadow-lg shadow-red-900/20",
-        ghost: "bg-transparent hover:bg-white/5 text-neutral-300 hover:text-white",
+        primary: "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_10px_20px_-10px_rgba(37,99,235,0.4)] hover:shadow-[0_15px_25px_-10px_rgba(37,99,235,0.5)]",
+        secondary: "bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800 shadow-sm",
+        danger: "bg-red-600 hover:bg-red-500 text-white shadow-[0_10px_20px_-10px_rgba(220,38,38,0.4)] hover:shadow-[0_15px_25px_-10px_rgba(220,38,38,0.5)]",
+        ghost: "bg-transparent hover:bg-neutral-100 dark:hover:bg-white/5 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white",
     };
 
     return (

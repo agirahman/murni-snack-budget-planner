@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
-import { Plus, TrendingUp, TrendingDown, Minus, Calendar } from "lucide-react";
+import { PriceTrendChart } from "@/components/ui/PriceTrendChart";
+import { Plus, TrendingUp, TrendingDown, Minus, Calendar, BarChart3, Info } from "lucide-react";
 
 interface Product {
     _id: string;
@@ -47,7 +48,7 @@ export default function PricesPage() {
         satuan: "kg" as "kg" | "dus",
         tanggal: new Date().toISOString().split("T")[0]
     });
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
     useEffect(() => {
         if (!authLoading && !user) {
             router.push("/login");
@@ -93,6 +94,9 @@ export default function PricesPage() {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+        if (isSubmitting) return;
+
+        setIsSubmitting(true);
         try {
             await api.post("/prices", {
                 ...formData,
@@ -110,6 +114,8 @@ export default function PricesPage() {
         } catch (error) {
             console.error("Error saving price:", error);
             showToast("Gagal menyimpan harga", "error");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -178,40 +184,65 @@ export default function PricesPage() {
                     </Button>
                 </div>
 
-                {/* Filter by Product */}
-                <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1">
-                        <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">
-                            Filter Produk
-                        </label>
-                        <select
-                            value={selectedProductId}
-                            onChange={(e) => setSelectedProductId(e.target.value)}
-                            className="w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 px-3 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-                        >
-                            <option value="">Semua Produk ({prices.length} data)</option>
-                            {products.map((product) => {
-                                const count = prices.filter(p => p.product_id._id === product._id).length;
-                                return (
-                                    <option key={product._id} value={product._id}>
-                                        {product.nama_produk} ({count} data)
-                                    </option>
-                                );
-                            })}
-                        </select>
+                {/* Trend Analysis Section - Only visible when a product is selected */}
+                {selectedProductId && filteredPrices.length > 1 && (
+                    <Card className="p-6 border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                        <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center gap-2">
+                                <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+                                    <BarChart3 size={18} className="text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">Tren Harga</h3>
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400">Visualisasi perubahan harga dari waktu ke waktu</p>
+                                </div>
+                            </div>
+                        </div>
+                        <PriceTrendChart data={filteredPrices} height={200} />
+                    </Card>
+                )}
+
+                {/* Sticky Filter Container */}
+                <div className="sticky top-16 z-20 -mx-4 px-4 py-4 bg-neutral-50/80 dark:bg-neutral-950/80 backdrop-blur-md border-b border-transparent transition-all duration-200">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="flex flex-col sm:flex-row gap-3 items-end">
+                            <div className="flex-1 w-full">
+                                <label className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1.5 flex items-center gap-1.5">
+                                    <Info size={14} className="text-blue-500" />
+                                    Filter Produk
+                                </label>
+                                <select
+                                    value={selectedProductId}
+                                    onChange={(e) => setSelectedProductId(e.target.value)}
+                                    className="w-full h-11 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-sm px-3 text-neutral-900 dark:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all cursor-pointer hover:border-neutral-300 dark:hover:border-neutral-700"
+                                >
+                                    <option value="">Semua Produk ({prices.length} data)</option>
+                                    {products.map((product) => {
+                                        const count = prices.filter(p => p.product_id._id === product._id).length;
+                                        return (
+                                            <option key={product._id} value={product._id}>
+                                                {product.nama_produk} ({count} data)
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                            </div>
+                            {selectedProductId && (
+                                <button
+                                    onClick={() => setSelectedProductId("")}
+                                    className="h-11 px-6 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all text-sm font-medium whitespace-nowrap shadow-sm"
+                                >
+                                    Reset Filter
+                                </button>
+                            )}
+                        </div>
                     </div>
-                    {selectedProductId && (
-                        <button
-                            onClick={() => setSelectedProductId("")}
-                            className="self-end h-11 px-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/50 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors text-sm font-medium"
-                        >
-                            Reset Filter
-                        </button>
-                    )}
                 </div>
 
                 {/* Price History List */}
-                <Card className="overflow-hidden">
+                <Card className="overflow-hidden border-neutral-200 dark:border-neutral-800 shadow-sm relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full -mr-16 -mt-16 blur-3xl" />
                     {loading ? (
                         <div className="p-8 text-center text-neutral-500">Memuat data...</div>
                     ) : filteredPrices.length === 0 ? (
@@ -333,7 +364,11 @@ export default function PricesPage() {
                             required
                         />
 
-                        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white">
+                        <Button
+                            type="submit"
+                            className="w-full bg-blue-600 hover:bg-blue-500 text-white mt-2"
+                            isLoading={isSubmitting}
+                        >
                             Simpan Harga
                         </Button>
                     </form>
